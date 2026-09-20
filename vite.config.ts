@@ -11,7 +11,7 @@ export default defineConfig({
       manifest: {
         name: 'Rituel — suivi quotidien',
         short_name: 'Rituel',
-        description: 'Habitudes, séances, hydratation, pas, soulagement naturel et code de la route.',
+        description: 'Habitudes, séances, hydratation, pas, niveaux et code de la route.',
         theme_color: '#F4F3FA',
         background_color: '#F4F3FA',
         display: 'standalone',

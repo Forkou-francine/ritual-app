@@ -9,6 +9,10 @@ export function addDays(iso: string, days: number): string {
   return isoDate(d)
 }
 
+export function daysBetween(a: string, b: string): number {
+  return Math.round((new Date(b + 'T12:00:00').getTime() - new Date(a + 'T12:00:00').getTime()) / 86400000)
+}
+
 export function lastNDates(n: number, end: string = isoDate()): string[] {
   return Array.from({ length: n }, (_, i) => addDays(end, i - n + 1))
 }

@@ -1,6 +1,6 @@
 # Rituel
 
-Application de suivi quotidien : séances, hydratation, pas, repas, soulagement naturel et code de la route.
+Application de suivi quotidien : séances, hydratation, pas, habitudes, niveaux et code de la route.
 PWA installable sur iOS et Android, fonctionne hors ligne, données stockées uniquement sur l'appareil.
 
 ## Démarrer

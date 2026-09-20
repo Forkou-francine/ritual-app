@@ -2,7 +2,7 @@ import type { Question } from '../db/types'
 
 type Seed = Pick<Question, 'theme' | 'prompt' | 'choices' | 'answer' | 'explanation' | 'source'>
 
-export const THEMES = ['Priorités', 'Vitesse', 'Signalisation', 'Conduite', 'Sécurité', 'Administratif']
+export const THEMES = ['Signalisation', 'Priorités', 'Vitesse', 'Conduite', 'Autres usagers', 'Sécurité', 'Administratif']
 
 const raw: Seed[] = [
   {
@@ -124,6 +124,54 @@ const raw: Seed[] = [
     answer: 1,
     explanation: 'Premier contrôle dans les six mois précédant le quatrième anniversaire de la première mise en circulation, puis tous les deux ans.',
     source: 'Code de la route, art. R323-22',
+  },
+  {
+    theme: 'Autres usagers',
+    prompt: 'En agglomération, quelle distance latérale minimale devez-vous laisser en dépassant un cycliste ?',
+    choices: ['50 cm', '1 mètre', '1,5 mètre'],
+    answer: 1,
+    explanation: 'Le dépassement d’un cycliste exige au moins 1 mètre d’écart en agglomération, et 1,5 mètre hors agglomération.',
+    source: 'Code de la route, art. R414-4',
+  },
+  {
+    theme: 'Autres usagers',
+    prompt: 'Hors agglomération, quelle distance latérale minimale devez-vous laisser en dépassant un cycliste ?',
+    choices: ['1 mètre', '1,5 mètre', '2 mètres'],
+    answer: 1,
+    explanation: 'Hors agglomération, l’écart minimal est de 1,5 mètre (1 mètre en agglomération).',
+    source: 'Code de la route, art. R414-4',
+  },
+  {
+    theme: 'Autres usagers',
+    prompt: 'Un piéton s’engage régulièrement sur un passage piéton. Que devez-vous faire ?',
+    choices: ['Klaxonner pour l’avertir', 'Lui céder le passage en vous arrêtant à distance suffisante', 'Passer avant lui s’il est loin de votre voie'],
+    answer: 1,
+    explanation: 'Le conducteur doit céder le passage au piéton qui s’engage régulièrement, et s’arrêter à une distance lui permettant de le faire sans danger.',
+    source: 'Code de la route, art. R415-11',
+  },
+  {
+    theme: 'Autres usagers',
+    prompt: 'En agglomération, un autobus quitte son arrêt en mettant son clignotant. Que devez-vous faire ?',
+    choices: ['Le klaxonner pour qu’il attende', 'Lui céder le passage', 'Le dépasser rapidement par la gauche'],
+    answer: 1,
+    explanation: 'En agglomération, vous devez céder le passage à un véhicule de transport en commun qui signale son intention de reprendre sa route depuis l’arrêt.',
+    source: 'Code de la route, art. R415-14',
+  },
+  {
+    theme: 'Autres usagers',
+    prompt: 'Un enfant de moins de 12 ans fait du vélo. Le port du casque est-il obligatoire ?',
+    choices: ['Non, il est seulement recommandé', 'Oui, qu’il soit conducteur ou passager', 'Oui, uniquement hors agglomération'],
+    answer: 1,
+    explanation: 'Le casque homologué est obligatoire pour les enfants de moins de 12 ans à vélo, qu’ils conduisent ou soient passagers, en ville comme hors agglomération.',
+    source: 'Code de la route, art. R431-1-1',
+  },
+  {
+    theme: 'Autres usagers',
+    prompt: 'Vous entendez la sirène d’un véhicule prioritaire (ambulance, pompiers) derrière vous. Que faites-vous ?',
+    choices: ['Vous accélérez pour dégager la route', 'Vous facilitez son passage en vous rangeant, en vous arrêtant si nécessaire', 'Vous continuez à la même allure'],
+    answer: 1,
+    explanation: 'Dès que vous percevez le signal, vous devez faciliter le passage du véhicule prioritaire, en vous rangeant et en vous arrêtant si besoin, sans mettre personne en danger.',
+    source: 'Code de la route, art. R432-4',
   },
 ]
 

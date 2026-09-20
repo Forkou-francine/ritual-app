@@ -48,14 +48,6 @@ export interface HabitEntry {
   done: boolean
 }
 
-export interface Remedy {
-  id?: number
-  name: string
-  symptoms: string[]
-  howTo: string
-  icon: string
-}
-
 export interface Question {
   id?: number
   theme: string
@@ -67,6 +59,8 @@ export interface Question {
   ease: number
   intervalDays: number
   dueDate: string
+  /** Marquée d'un signet : revient dans « Mes erreurs ». */
+  flagged?: boolean
 }
 
 export interface Attempt {
@@ -79,4 +73,16 @@ export interface Attempt {
 export interface Setting {
   key: string
   value: number | string
+}
+
+export type CodeSessionKind = 'jour' | 'examen' | 'erreurs' | 'theme'
+
+/** Une séance de code terminée : sert aux examens blancs, au plan et à la progression. */
+export interface CodeSession {
+  id?: number
+  date: string
+  kind: CodeSessionKind
+  theme?: string
+  score: number
+  total: number
 }

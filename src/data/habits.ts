@@ -35,3 +35,17 @@ export const habitSeed: Seed[] = [
     order: 1,
   },
 ]
+
+type Suggestion = Omit<Habit, 'id' | 'order' | 'days' | 'note'>
+
+/** Habitudes proposées à l'accueil ; les deux premières sont celles du démarrage. */
+export const habitSuggestions: Suggestion[] = [
+  { name: 'Lecture', emoji: '📖', kind: 'count', unit: 'pages', goal: 20, step: 5, noteLabel: 'Livre en cours' },
+  { name: 'Méditation', emoji: '🧘', kind: 'check' },
+  { name: 'Marche', emoji: '🚶', kind: 'count', unit: 'min', goal: 30, step: 10 },
+  { name: 'Coucher tôt', emoji: '😴', kind: 'check' },
+  { name: 'Journal', emoji: '✍️', kind: 'check' },
+  { name: 'Bien manger', emoji: '🥗', kind: 'check' },
+  { name: 'Étirements', emoji: '🤸', kind: 'check' },
+  { name: 'Sans écran le soir', emoji: '📵', kind: 'check' },
+]

@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import { db } from '../../db/db'
 import { bumpHabit, isComplete, isScheduled, setHabitNote, setHabitValue, toggleHabit } from '../../db/habits'
 import { PROFILE_AVATARS, setProfileField, useProfile } from '../../db/profile'
-import { isoDate, lastNDates } from '../../lib/date'
+import { useProgress } from '../../db/stats'
+import { isoDate } from '../../lib/date'
 import type { Habit, HabitEntry } from '../../db/types'
 import Screen from '../../components/Screen'
 import Icon from '../../components/Icon'
+import RemindersCard from './RemindersCard'
 
 export default function Profile() {
   const today = isoDate()
@@ -15,19 +17,7 @@ export default function Profile() {
   const habits = useLiveQuery(() => db.habits.orderBy('order').toArray())
   const entries = useLiveQuery(() => db.habitEntries.where('date').equals(today).toArray(), [today])
 
-  // Série globale : un jour compte s'il a rempli un objectif quelconque.
-  const streak = useLiveQuery(async () => {
-    const days = lastNDates(60)
-    const logs = await db.dailyLogs.where('date').anyOf(days).toArray()
-    const byDate = new Map(logs.map((l) => [l.date, l]))
-    let n = 0
-    for (const d of days.slice().reverse()) {
-      const l = byDate.get(d)
-      if (l && (l.workoutDone || l.waterMl >= profile.waterMl || l.steps >= profile.steps)) n++
-      else if (d !== today) break
-    }
-    return n
-  }, [today, profile.waterMl, profile.steps])
+  const streak = useProgress()?.streak
 
   if (!habits || !entries) return null
 
@@ -111,6 +101,8 @@ export default function Profile() {
           </div>
         </div>
       </section>
+
+      <RemindersCard />
 
       <section className="card-hero mt-3.5">
         <p className="text-meta uppercase tracking-label text-white/85">Aujourd’hui</p>
@@ -197,6 +189,13 @@ function HabitCard({ habit, entry, today }: { habit: Habit; entry?: HabitEntry; 
                   : 'à faire aujourd’hui'}
           </p>
         </div>
+        <Link
+          to={`/habitude/${habit.id}/suivi`}
+          className="chip bg-violet-soft text-violet"
+          aria-label={`Suivi de ${habit.name}`}
+        >
+          Suivi
+        </Link>
         <Link
           to={`/habitude/${habit.id}`}
           className="chip bg-page text-ink-500"

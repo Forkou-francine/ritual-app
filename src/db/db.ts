@@ -1,12 +1,12 @@
 import Dexie, { type Table } from 'dexie'
-import type { Attempt, DailyLog, Exercise, Habit, HabitEntry, Question, Remedy, Setting } from './types'
+import type { Attempt, CodeSession, DailyLog, Exercise, Habit, HabitEntry, Question, Setting } from './types'
 
 export class LifestyleDB extends Dexie {
   dailyLogs!: Table<DailyLog, number>
   exercises!: Table<Exercise, number>
-  remedies!: Table<Remedy, number>
   questions!: Table<Question, number>
   attempts!: Table<Attempt, number>
+  codeSessions!: Table<CodeSession, number>
   settings!: Table<Setting, string>
   habits!: Table<Habit, number>
   habitEntries!: Table<HabitEntry, number>
@@ -28,6 +28,10 @@ export class LifestyleDB extends Dexie {
       habits: '++id, order',
       habitEntries: '++id, &[habitId+date], habitId, date',
     })
+    // v3 : la rubrique « soulagement » disparaît, on purge sa table.
+    this.version(3).stores({ remedies: null })
+    // v4 : historique des séances de code (examens blancs, plan de 8 semaines).
+    this.version(4).stores({ codeSessions: '++id, date, kind' })
   }
 }
 

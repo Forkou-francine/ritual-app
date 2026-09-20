@@ -5,7 +5,9 @@ import { db, GLASS_ML } from '../../db/db'
 import { getOrCreateLog, patchLog } from '../../db/seed'
 import { bumpHabit, isComplete, isScheduled, toggleHabit } from '../../db/habits'
 import { formatLitres, glassesFor, useProfile } from '../../db/profile'
-import { formatLong, isoDate, lastNDates } from '../../lib/date'
+import { useProgress } from '../../db/stats'
+import { XP_PER_LEVEL } from '../../lib/xp'
+import { formatLong, isoDate } from '../../lib/date'
 import { SESSION_TITLES } from '../../data/exercises'
 import type { Weekday } from '../../db/types'
 import Screen from '../../components/Screen'
@@ -23,17 +25,8 @@ export default function Today() {
     getOrCreateLog(today)
   }, [today])
 
-  const streak = useLiveQuery(async () => {
-    const logs = await db.dailyLogs.where('date').anyOf(lastNDates(60)).toArray()
-    const byDate = new Map(logs.map((l) => [l.date, l]))
-    let n = 0
-    for (const d of lastNDates(60).reverse()) {
-      const l = byDate.get(d)
-      if (l && (l.workoutDone || l.waterMl >= profile.waterMl || l.steps >= profile.steps)) n++
-      else if (d !== today) break
-    }
-    return n
-  }, [today, profile.waterMl, profile.steps])
+  const progress = useProgress()
+  const streak = progress?.streak ?? 0
   const dueCount = useLiveQuery(() => db.questions.where('dueDate').belowOrEqual(today).count(), [today])
   const habits = useLiveQuery(() => db.habits.orderBy('order').toArray())
   const habitEntries = useLiveQuery(() => db.habitEntries.where('date').equals(today).toArray(), [today])
@@ -49,7 +42,6 @@ export default function Today() {
 
   const goals = [log.waterMl >= profile.waterMl, log.steps >= profile.steps, log.workoutDone]
   const goalsDone = goals.filter(Boolean).length
-  const goalsPct = Math.round((goalsDone / goals.length) * 100)
 
   return (
     <Screen
@@ -65,18 +57,20 @@ export default function Today() {
         </Link>
       }
     >
-      {/* Carte d'objectifs : équivalent de la barre d'XP de la maquette */}
+      {/* Niveau et barre d'XP */}
       <section className="card-hero">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-chip bg-white/20 font-display text-[17px] font-bold">
-              {goalsDone}
+            <span className="flex h-10 w-10 items-center justify-center rounded-chip bg-white/20 font-display text-[18px] font-bold">
+              {progress?.level ?? 1}
             </span>
             <div>
               <p className="font-display text-lead font-bold">
-                {goalsDone === 3 ? 'Journée complète' : 'Objectifs du jour'}
+                Niveau {progress?.level ?? 1} · {progress?.title ?? 'Débutant'}
               </p>
-              <p className="text-meta text-white/80">{goalsDone} sur 3 · eau, pas, séance</p>
+              <p className="text-meta text-white/80">
+                {progress?.into ?? 0} / {XP_PER_LEVEL} XP vers le niveau {(progress?.level ?? 1) + 1}
+              </p>
             </div>
           </div>
           <span className="text-[20px]">{goalsDone === 3 ? '🎉' : '🔥'}</span>
@@ -84,7 +78,7 @@ export default function Today() {
         <div className="mt-3.5 h-2.5 overflow-hidden rounded-full bg-white/25">
           <div
             className="h-full rounded-full bg-lime transition-[width]"
-            style={{ width: `${goalsPct}%` }}
+            style={{ width: `${Math.round(((progress?.into ?? 0) / XP_PER_LEVEL) * 100)}%` }}
           />
         </div>
       </section>
@@ -92,20 +86,22 @@ export default function Today() {
       {/* Trio de statistiques */}
       <div className="mt-3.5 flex gap-3">
         <div className="tile flex-1">
-          <p className="font-display text-stat font-bold text-ember">{streak ?? 0}</p>
+          <p className="font-display text-stat font-bold text-ember">{streak}</p>
           <p className="mt-0.5 text-micro text-ink-500">jours de série</p>
         </div>
         <div className="tile flex-1">
           <p className="font-display text-stat font-bold text-violet">
-            {glassesDrunk}
-            <span className="text-meta text-ink-300">/{GLASSES}</span>
+            {goalsDone + habitsDone}
+            <span className="text-meta text-ink-300">/{3 + todayHabits.length}</span>
           </p>
-          <p className="mt-0.5 text-micro text-ink-500">verres bus</p>
+          <p className="mt-0.5 text-micro text-ink-500">faites ce jour</p>
         </div>
-        <div className="tile flex-1">
-          <p className="font-display text-stat font-bold text-grass">{dueCount ?? 0}</p>
-          <p className="mt-0.5 text-micro text-ink-500">à réviser</p>
-        </div>
+        <Link to="/bilan" className="tile flex-1">
+          <p className="font-display text-stat font-bold text-grass">
+            {progress?.badges.filter((b) => b.earned).length ?? 0}
+          </p>
+          <p className="mt-0.5 text-micro text-ink-500">badges</p>
+        </Link>
       </div>
 
       {/* Suivi saisissable */}
@@ -187,7 +183,7 @@ export default function Today() {
               {log.workoutDone ? 'séance terminée' : 'séance du jour · à faire'}
             </span>
           </span>
-          <span className="chip bg-page text-ink-500">🔥{streak ?? 0}</span>
+          <span className="chip bg-page text-ink-500">🔥{streak}</span>
         </Link>
 
         <Link to="/code" className="flex items-center gap-3.5 rounded-card bg-card p-4 shadow-soft">
@@ -215,7 +211,7 @@ export default function Today() {
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-chip bg-violet-soft text-[17px]">
                 {h.emoji}
               </span>
-              <Link to="/moi" className="flex-1">
+              <Link to={`/habitude/${h.id}/suivi`} className="flex-1">
                 <span className={`block text-body font-semibold ${complete ? 'text-ink-300 line-through' : ''}`}>
                   {h.name}
                 </span>

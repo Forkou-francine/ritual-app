@@ -73,3 +73,65 @@ export async function habitStreak(habit: Habit, today: string) {
   }
   return streak
 }
+
+export interface HabitStats {
+  /** 90 derniers jours : niveau d'intensité 0-3 et jour prévu ou non. */
+  days: { date: string; level: 0 | 1 | 2 | 3; scheduled: boolean }[]
+  streak: number
+  best: number
+  /** Part des jours prévus réussis sur 90 jours, en %. */
+  rate: number
+  total: number
+  monthDone: number
+  monthScheduled: number
+}
+
+/** Détail d'une habitude : carte de chaleur, séries, taux de réussite. */
+export async function habitStats(habit: Habit, today: string): Promise<HabitStats> {
+  const entries = await db.habitEntries.where('habitId').equals(habit.id!).toArray()
+  const byDate = new Map(entries.map((e) => [e.date, e]))
+
+  const days = lastNDates(90).map((date) => {
+    const scheduled = isScheduled(habit, date)
+    const entry = byDate.get(date)
+    let level: 0 | 1 | 2 | 3 = 0
+    if (isComplete(habit, entry)) level = 3
+    else if (habit.kind === 'count' && entry && entry.value > 0) {
+      level = entry.value / (habit.goal ?? 1) >= 0.5 ? 2 : 1
+    }
+    return { date, level, scheduled }
+  })
+
+  let best = 0
+  let run = 0
+  let planned = 0
+  let succeeded = 0
+  for (const d of days) {
+    if (!d.scheduled) continue
+    planned++
+    if (d.level === 3) {
+      succeeded++
+      run++
+      best = Math.max(best, run)
+    } else if (d.date !== today) run = 0
+  }
+
+  let streak = 0
+  for (const d of days.slice().reverse()) {
+    if (!d.scheduled) continue
+    if (d.level === 3) streak++
+    else if (d.date !== today) break
+  }
+
+  const month = today.slice(0, 7)
+  const inMonth = days.filter((d) => d.scheduled && d.date.startsWith(month))
+  return {
+    days,
+    streak,
+    best,
+    rate: planned ? Math.round((succeeded / planned) * 100) : 0,
+    total: entries.filter((e) => isComplete(habit, e)).length,
+    monthDone: inMonth.filter((d) => d.level === 3).length,
+    monthScheduled: inMonth.length,
+  }
+}

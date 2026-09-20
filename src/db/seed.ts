@@ -1,6 +1,5 @@
 import { db } from './db'
 import { exerciseSeed } from '../data/exercises'
-import { remedySeed } from '../data/remedies'
 import { questionSeed } from '../data/questions'
 import { habitSeed } from '../data/habits'
 import { isoDate } from '../lib/date'
@@ -8,13 +7,19 @@ import { isoDate } from '../lib/date'
 export async function seedIfEmpty() {
   // Le test « déjà amorcé ? » vit dans la transaction : deux appels concurrents
   // (React StrictMode monte deux fois en dev) sérialisent alors au lieu de semer en double.
-  await db.transaction('rw', db.exercises, db.remedies, db.questions, db.settings, async () => {
+  await db.transaction('rw', db.exercises, db.questions, db.settings, async () => {
     const done = await db.settings.get('seeded')
     if (done) return
     await db.exercises.bulkAdd(exerciseSeed)
-    await db.remedies.bulkAdd(remedySeed)
     await db.questions.bulkAdd(questionSeed(isoDate()))
     await db.settings.put({ key: 'seeded', value: 1 })
+  })
+
+  // Complète la banque : les questions ajoutées après le premier lancement arrivent ici.
+  await db.transaction('rw', db.questions, async () => {
+    const known = new Set((await db.questions.toArray()).map((q) => q.prompt))
+    const missing = questionSeed(isoDate()).filter((q) => !known.has(q.prompt))
+    if (missing.length) await db.questions.bulkAdd(missing)
   })
 
   // Amorçage séparé : les bases créées avant les habitudes doivent le recevoir aussi.
