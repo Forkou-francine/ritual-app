@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node probe-debug.mjs)",
+      "Bash(curl -s \"http://localhost:5190/src/index.css\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:5190/src/index.css)",
+      "PowerShell($conns = Get-NetTCPConnection -LocalPort 5190 -State Listen -ErrorAction SilentlyContinue; if \\($conns\\) { $conns | Select-Object -ExpandProperty OwningProcess -Unique | ForEach-Object { Write-Output \"killing PID $_\"; Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue } } else { Write-Output \"nothing listening on 5190\" })",
+      "Bash(rm -f src/features/meals/Meals.tsx src/data/meals.ts)",
+      "Bash(rmdir src/features/meals)",
+      "Bash(node probe-habits.mjs)",
+      "Bash(cd \"d:/Ange/projets/lifestyle-app\" *)",
+      "Read(//tmp/**)"
+    ]
+  }
+}

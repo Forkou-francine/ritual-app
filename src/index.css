@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-page text-ink-900 antialiased;
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    overscroll-behavior-y: none;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-violet ring-offset-2 ring-offset-page;
+  }
+}
+
+@layer components {
+  /* Surfaces */
+  .card {
+    @apply rounded-card bg-card p-4 shadow-soft;
+  }
+  .card-lg {
+    @apply rounded-card bg-card p-5 shadow-card;
+  }
+  .card-hero {
+    @apply rounded-card bg-gradient-to-br from-violet to-violet-light p-5 text-white;
+  }
+  .tile {
+    @apply rounded-tile bg-card p-4 shadow-soft;
+  }
+  .row {
+    @apply flex items-center gap-3 border-b border-ink-100 py-3 last:border-0;
+  }
+
+  /* Libellé de section en petites capitales */
+  .label {
+    @apply text-meta font-semibold uppercase tracking-label text-ink-500;
+  }
+
+  /* Puces de filtre */
+  .pill {
+    @apply rounded-full border border-ink-200 bg-card px-3.5 py-1.5 text-meta text-ink-500 transition-colors;
+  }
+  .pill-on {
+    @apply border-violet bg-violet text-white;
+  }
+
+  /* Boutons */
+  .btn {
+    @apply h-12 w-full rounded-tile border border-ink-200 bg-card font-display text-body font-semibold
+           transition-transform active:scale-[0.98] disabled:opacity-40;
+  }
+  .btn-primary {
+    @apply border-transparent bg-lime text-lime-deep;
+  }
+  .btn-violet {
+    @apply border-transparent bg-violet text-white shadow-lift;
+  }
+
+  /* Badge arrondi (série, XP, compteur) */
+  .chip {
+    @apply rounded-full px-2.5 py-1 text-micro font-medium;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

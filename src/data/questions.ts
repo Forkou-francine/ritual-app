@@ -1,0 +1,132 @@
+import type { Question } from '../db/types'
+
+type Seed = Pick<Question, 'theme' | 'prompt' | 'choices' | 'answer' | 'explanation' | 'source'>
+
+export const THEMES = ['Priorités', 'Vitesse', 'Signalisation', 'Conduite', 'Sécurité', 'Administratif']
+
+const raw: Seed[] = [
+  {
+    theme: 'Priorités',
+    prompt: 'À une intersection sans panneau ni marquage, qui passe en premier ?',
+    choices: ['Le véhicule venant de la droite', 'Le véhicule le plus rapide', 'Le véhicule déjà engagé à gauche'],
+    answer: 0,
+    explanation: 'En l\u2019absence de signalisation, la priorité à droite s\u2019applique. Elle vaut pour tous les usagers, y compris les cyclistes.',
+    source: 'Code de la route, art. R415-5',
+  },
+  {
+    theme: 'Priorités',
+    prompt: 'Vous abordez un rond-point signalé par un panneau « Cédez le passage ». Que faites-vous ?',
+    choices: ['Vous passez, la priorité à droite s\u2019applique', 'Vous laissez passer les véhicules déjà sur l\u2019anneau', 'Vous vous arrêtez systématiquement'],
+    answer: 1,
+    explanation: 'Le panneau supprime la priorité à droite : les véhicules circulant sur l\u2019anneau passent d\u2019abord. L\u2019arrêt complet n\u2019est obligatoire que si la circulation l\u2019impose.',
+    source: 'Code de la route, art. R415-10',
+  },
+  {
+    theme: 'Priorités',
+    prompt: 'Un véhicule de secours approche, sirène et gyrophare en fonction. Vous devez :',
+    choices: ['Accélérer pour libérer la voie', 'Vous ranger et vous arrêter si nécessaire', 'Rester en place, il vous contournera'],
+    answer: 1,
+    explanation: 'Vous devez faciliter le passage en vous rangeant, quitte à vous arrêter. Accélérer est dangereux et ne dispense pas du respect des limitations.',
+    source: 'Code de la route, art. R415-14',
+  },
+  {
+    theme: 'Vitesse',
+    prompt: 'Sur autoroute par temps de pluie, la vitesse maximale autorisée passe à :',
+    choices: ['110 km/h', '120 km/h', '130 km/h'],
+    answer: 0,
+    explanation: 'La limitation descend de 130 à 110 km/h en cas de précipitations. Elle tombe à 50 km/h si la visibilité est inférieure à 50 mètres.',
+    source: 'Code de la route, art. R413-2',
+  },
+  {
+    theme: 'Vitesse',
+    prompt: 'En agglomération, la vitesse maximale par défaut est de :',
+    choices: ['30 km/h', '50 km/h', '70 km/h'],
+    answer: 1,
+    explanation: '50 km/h s\u2019applique dès le panneau d\u2019entrée d\u2019agglomération, sauf abaissement local signalé, fréquent en zone 30.',
+    source: 'Code de la route, art. R413-3',
+  },
+  {
+    theme: 'Vitesse',
+    prompt: 'Vous avez le permis probatoire. Sur route à double sens sans séparateur central, votre limite est :',
+    choices: ['80 km/h', '90 km/h', '100 km/h'],
+    answer: 0,
+    explanation: 'La limite générale y est de 80 km/h et le permis probatoire ne l\u2019abaisse pas davantage. C\u2019est sur autoroute que le probatoire impose 110 au lieu de 130.',
+    source: 'Code de la route, art. R413-5',
+  },
+  {
+    theme: 'Signalisation',
+    prompt: 'Un panneau triangulaire à fond blanc et bordure rouge signifie :',
+    choices: ['Une interdiction', 'Un danger', 'Une obligation'],
+    answer: 1,
+    explanation: 'Le triangle annonce un danger. L\u2019interdiction est ronde à bordure rouge, l\u2019obligation ronde à fond bleu.',
+    source: 'Arrêté du 24 novembre 1967, signalisation routière',
+  },
+  {
+    theme: 'Signalisation',
+    prompt: 'Une ligne continue sépare les deux sens de circulation. Vous pouvez la franchir :',
+    choices: ['Jamais', 'Pour dépasser un cycliste', 'Pour contourner un obstacle imprévu immobilisant la voie'],
+    answer: 2,
+    explanation: 'Le franchissement reste interdit, sauf nécessité absolue comme un obstacle immobilisant la circulation. Dépasser un cycliste ne justifie pas de franchir une ligne continue.',
+    source: 'Code de la route, art. R412-19',
+  },
+  {
+    theme: 'Conduite',
+    prompt: 'Hors agglomération, quel écart latéral minimal devez-vous laisser en dépassant un cycliste ?',
+    choices: ['1 mètre', '1,50 mètre', '2 mètres'],
+    answer: 1,
+    explanation: '1,50 mètre hors agglomération, 1 mètre en agglomération. Si l\u2019espace manque, il faut renoncer au dépassement.',
+    source: 'Code de la route, art. R414-4',
+  },
+  {
+    theme: 'Conduite',
+    prompt: 'Sur autoroute à 130 km/h, la distance de sécurité minimale avec le véhicule précédent correspond à :',
+    choices: ['1 seconde', '2 secondes', '3 secondes'],
+    answer: 1,
+    explanation: 'La règle est de deux secondes, soit environ 72 mètres à cette vitesse. Un intervalle plus large reste préférable sur chaussée humide.',
+    source: 'Code de la route, art. R412-12',
+  },
+  {
+    theme: 'Sécurité',
+    prompt: 'Pour un conducteur en permis probatoire, le taux d\u2019alcool maximal dans le sang est de :',
+    choices: ['0,2 g/l', '0,5 g/l', '0,8 g/l'],
+    answer: 0,
+    explanation: '0,2 g/l pendant toute la période probatoire, ce qui revient en pratique à ne pas boire du tout. La limite générale est de 0,5 g/l.',
+    source: 'Code de la route, art. R234-1',
+  },
+  {
+    theme: 'Sécurité',
+    prompt: 'Que doit contenir au minimum l\u2019équipement de sécurité obligatoire à bord ?',
+    choices: ['Un gilet et un triangle', 'Un extincteur et une trousse de secours', 'Un gilet, un triangle et un éthylotest'],
+    answer: 0,
+    explanation: 'Le gilet de haute visibilité et le triangle de présignalisation sont obligatoires. L\u2019éthylotest n\u2019est plus sanctionné depuis 2020.',
+    source: 'Code de la route, art. R416-19',
+  },
+  {
+    theme: 'Sécurité',
+    prompt: 'Après un accident sans blessé, vous devez :',
+    choices: ['Appeler systématiquement la police', 'Dégager la chaussée si possible et remplir un constat', 'Laisser les véhicules en place jusqu\u2019à l\u2019arrivée d\u2019un expert'],
+    answer: 1,
+    explanation: 'Sans blessé ni désaccord grave, il faut protéger, dégager si les véhicules sont roulants, puis établir le constat amiable.',
+    source: 'Code de la route, art. R231-1',
+  },
+  {
+    theme: 'Administratif',
+    prompt: 'Combien de points compte le permis probatoire la première année ?',
+    choices: ['6 points', '8 points', '12 points'],
+    answer: 0,
+    explanation: 'Le permis probatoire démarre à 6 points, puis en gagne 2 par an sans infraction (3 par an avec la conduite accompagnée).',
+    source: 'Code de la route, art. L223-1',
+  },
+  {
+    theme: 'Administratif',
+    prompt: 'Le contrôle technique d\u2019une voiture particulière neuve est exigé :',
+    choices: ['Au bout de 2 ans', 'Dans les 6 mois avant le 4e anniversaire', 'Tous les ans dès la mise en circulation'],
+    answer: 1,
+    explanation: 'Premier contrôle dans les six mois précédant le quatrième anniversaire de la première mise en circulation, puis tous les deux ans.',
+    source: 'Code de la route, art. R323-22',
+  },
+]
+
+export function questionSeed(today: string): Omit<Question, 'id'>[] {
+  return raw.map((q) => ({ ...q, ease: 2.5, intervalDays: 0, dueDate: today }))
+}
