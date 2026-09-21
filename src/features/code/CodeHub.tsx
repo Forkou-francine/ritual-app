@@ -128,6 +128,14 @@ export default function CodeHub() {
           >
             Commencer ▸
           </Link>
+          {weekMeta?.theme && (
+            <Link
+              to={`/code/fiche/${encodeURIComponent(weekMeta.theme)}`}
+              className="mt-2.5 flex items-center justify-center gap-1.5 text-[12.5px] font-semibold text-violet"
+            >
+              📖 Lire d’abord la fiche « {weekMeta.theme} »
+            </Link>
+          )}
         </section>
 
         <div className="mt-3.5 flex gap-3">
@@ -152,7 +160,16 @@ export default function CodeHub() {
           </Link>
         </div>
 
-        <Link to="/code/progression" className="tile mt-3.5 flex items-center gap-3.5 !p-3.5">
+        <Link to="/code/fiches" className="tile press mt-3.5 flex items-center gap-3.5 !p-3.5">
+          <span className="flex h-10 w-10 items-center justify-center rounded-chip bg-lime/40 text-[20px]">📖</span>
+          <span className="flex-1">
+            <span className="block text-[13px] font-bold">Fiches de cours</span>
+            <span className="block text-[10.5px] text-ink-500">7 thèmes · panneaux, règles et chiffres clés</span>
+          </span>
+          <span className="text-[16px] text-violet">›</span>
+        </Link>
+
+        <Link to="/code/progression" className="tile press mt-3.5 flex items-center gap-3.5 !p-3.5">
           <span className="flex h-10 w-10 items-center justify-center rounded-chip bg-violet-soft text-[20px]">📈</span>
           <span className="flex-1">
             <span className="block text-[13px] font-bold">Ma progression</span>

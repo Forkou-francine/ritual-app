@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import Icon from './Icon'
+import { haptic } from '../lib/haptics'
 
 const left = [
   { to: '/', icon: 'home', label: 'Aujourd’hui' },
@@ -12,12 +13,13 @@ const right = [
 
 function Tab({ to, icon, label }: { to: string; icon: string; label: string }) {
   return (
-    <li className="flex-1">
+    <li className="min-w-0 flex-1 basis-0">
       <NavLink
         to={to}
         end={to === '/'}
+        onClick={() => haptic('tap')}
         className={({ isActive }) =>
-          `flex flex-col items-center gap-1 pb-3 pt-3 text-[10px] transition-colors ${
+          `press flex flex-col items-center gap-1 pb-3 pt-3 text-[10px] transition-colors ${
             isActive ? 'font-semibold text-violet' : 'text-ink-300'
           }`
         }
@@ -25,7 +27,7 @@ function Tab({ to, icon, label }: { to: string; icon: string; label: string }) {
         {({ isActive }) => (
           <>
             <span
-              className={`flex h-9 w-9 items-center justify-center rounded-chip transition-colors ${
+              className={`flex h-9 w-12 items-center justify-center rounded-full transition-all duration-200 ${
                 isActive ? 'bg-violet-soft' : ''
               }`}
             >
@@ -41,12 +43,12 @@ function Tab({ to, icon, label }: { to: string; icon: string; label: string }) {
 
 export default function TabBar() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-black/5 bg-page/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-black/5 bg-page/80 pb-[env(safe-area-inset-bottom)] backdrop-blur-2xl backdrop-saturate-150">
       <ul className="mx-auto flex max-w-md items-start">
         {left.map((t) => (
           <Tab key={t.to} {...t} />
         ))}
-        <li className="flex flex-1 justify-center">
+        <li className="flex min-w-0 flex-1 basis-0 justify-center">
           <Link
             to="/habitude/nouvelle"
             aria-label="Nouvelle habitude"

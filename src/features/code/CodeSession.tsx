@@ -4,8 +4,12 @@ import { db } from '../../db/db'
 import { useProgress } from '../../db/stats'
 import { PLAN_WEEKS, PASS_RATIO, passMark, planState } from '../../lib/codePlan'
 import { isoDate } from '../../lib/date'
+import { haptic } from '../../lib/haptics'
 import { schedule } from '../../lib/srs'
 import { XP } from '../../lib/xp'
+import Scene from '../../components/Scene'
+import Sign from '../../components/Sign'
+import { visualFor } from '../../data/visuals'
 import type { CodeSessionKind, Question } from '../../db/types'
 
 const SIZE: Record<CodeSessionKind, number> = { jour: 20, examen: 40, erreurs: 20, theme: 20 }
@@ -108,6 +112,7 @@ export default function CodeSession() {
     const ok = choice === q.answer
     setSelected(choice)
     setValidated(true)
+    haptic(ok ? 'good' : 'bad')
     setResults((r) => [...r, { id: q.id!, correct: ok }])
     await db.questions.update(q.id!, schedule(q, ok, today))
     await db.attempts.add({ questionId: q.id!, date: today, correct: ok })
@@ -275,6 +280,7 @@ export default function CodeSession() {
   if (!q) return null
   const correct = selected === q.answer
   const timedOut = validated && selected === null
+  const visual = visualFor(q.prompt)
 
   return (
     <main className="mx-auto max-w-md px-5 pb-36 pt-[max(3.25rem,env(safe-area-inset-top))]">
@@ -328,6 +334,15 @@ export default function CodeSession() {
         </div>
       )}
 
+      {visual &&
+        (visual.kind === 'scene' ? (
+          <Scene id={visual.id} note={visual.note} caption={visual.caption} revealed={validated} className="mt-4" />
+        ) : (
+          <div className="mt-4 flex h-[132px] items-center justify-center rounded-card bg-gradient-to-br from-violet-soft to-white shadow-card">
+            <Sign id={visual.id} size={96} />
+          </div>
+        ))}
+
       <p className="mt-4 font-display text-[17px] font-bold leading-[1.3]">{q.prompt}</p>
 
       <div className="mt-3.5 flex flex-col gap-2.5">
@@ -338,10 +353,14 @@ export default function CodeSession() {
           return (
             <button
               key={c}
-              onClick={() => !validated && setSelected(i)}
+              onClick={() => {
+                if (validated) return
+                haptic('tap')
+                setSelected(i)
+              }}
               disabled={validated}
               aria-pressed={isPicked}
-              className={`flex w-full items-center gap-3 rounded-tile p-3.5 text-left transition-colors ${
+              className={`press flex w-full items-center gap-3 rounded-tile p-3.5 text-left transition-colors ${
                 state === 'picked'
                   ? 'border-[1.5px] border-violet bg-card shadow-ring'
                   : state === 'right'
@@ -382,6 +401,13 @@ export default function CodeSession() {
               <b>Référence :</b> {q.source}
             </p>
           </div>
+          <Link
+            to={`/code/fiche/${encodeURIComponent(q.theme)}`}
+            className="mt-3.5 flex items-center justify-between rounded-chip bg-violet-soft px-3.5 py-2.5 text-[12.5px] font-semibold text-violet"
+          >
+            <span>📖 Relire la fiche « {q.theme} »</span>
+            <span>›</span>
+          </Link>
         </section>
       )}
 

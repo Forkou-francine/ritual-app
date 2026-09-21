@@ -91,3 +91,15 @@ export function useCodeStats(): CodeStats | undefined {
     }
   })
 }
+
+/** Fiches de cours déjà lues, mémorisées dans les réglages (thèmes séparés par « | »). */
+const parse = (v: unknown) => (typeof v === 'string' && v ? v.split('|') : [])
+
+export function useLessonsRead() {
+  return useLiveQuery(async () => parse((await db.settings.get('lessonsRead'))?.value), []) ?? []
+}
+
+export async function markLessonRead(theme: string) {
+  const done = parse((await db.settings.get('lessonsRead'))?.value)
+  if (!done.includes(theme)) await db.settings.put({ key: 'lessonsRead', value: [...done, theme].join('|') })
+}
